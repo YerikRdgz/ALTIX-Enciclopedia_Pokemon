@@ -167,8 +167,6 @@ probabilidades = {"Gengar": 95, "Lucario": 85, "Buzzwole": 80, "Machamp": 75}
 df_equipo["probabilidad_victoria"] = df_equipo["nombre"].map(probabilidades)
 
 fig, ax = plt.subplots(figsize=(10, 6))
-
-# --- CORRECCIÓN DE COLORES AQUÍ ---
 tipos_equipo = df_equipo["tipo1"].unique()
 
 # Creamos un diccionario exclusivo para los tipos de este equipo
@@ -178,14 +176,10 @@ color_map_eq = {
 
 # Mapeamos los colores directamente a la columna del dataframe
 bar_colors_eq = df_equipo["tipo1"].map(color_map_eq)
-# ----------------------------------
 
 bars = ax.bar(
     df_equipo["nombre"], df_equipo["probabilidad_victoria"], color=bar_colors_eq
 )
-
-# La leyenda se arma usando nuestro nuevo diccionario corregido
-import matplotlib.patches as mpatches  # Por si no lo tenías importado
 
 leg_patches_eq = [mpatches.Patch(color=color_map_eq[t], label=t) for t in tipos_equipo]
 ax.legend(handles=leg_patches_eq, title="Tipo", loc="upper right")
