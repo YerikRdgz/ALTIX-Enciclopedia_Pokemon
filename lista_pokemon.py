@@ -2,13 +2,12 @@ import pandas as pd
 
 # 1. Cargar el archivo original
 try:
-    # Cambia 'pokemon.csv' por el nombre exacto de tu archivo si es distinto
     datos = pd.read_csv("pokemon.csv")
 except FileNotFoundError:
     print("Error: No se encontró el archivo 'pokemon.csv'")
     exit()
 
-# --- DICCIONARIOS MAESTROS ---
+# DICCIONARIOS 
 
 tipos_es = {
     "grass": "Planta",
@@ -79,9 +78,9 @@ def traducir_habilidades(valor):
     return ", ".join(traducidas)
 
 
-# --- PROCESAMIENTO ---
+# PROCESAMIENTO 
 
-# 1. Eliminar columnas innecesarias
+# Eliminar columnas innecesarias
 cols_a_borrar = [
     "nombre_japones",
     "clasificacion",
@@ -97,7 +96,7 @@ cols_a_borrar += [
 
 datos.drop(columns=cols_a_borrar, inplace=True, errors="ignore")
 
-# 2. Renombra columnas en formato de mysql
+# Renombrar columnas en formato de mysql
 columnas_map = {
     "No_Pokedex": "id_pokemon",
     "nombre": "Nombre",
@@ -121,18 +120,18 @@ columnas_map = {
 }
 datos.rename(columns=columnas_map, inplace=True)
 
-# 3. Extraer solo números de la captura y llenar nulos de altura/peso
+# Extraer solo números de la captura y llenar nulos de altura/peso
 datos["ratio_captura"] = (
     datos["ratio_captura"].astype(str).str.extract(r"(\d+)").astype(float)
 )
 datos["altura"] = datos["altura"].fillna(0)
 datos["peso"] = datos["peso"].fillna(0)
 
-# 4. Traducir Habilidades
+# Traducción de Habilidades
 if "Habilidades" in datos.columns:
     datos["Habilidades"] = datos["Habilidades"].apply(traducir_habilidades)
 
-# 5. Traducir Tipos
+# Tradución de los Tipos
 for col in ["Tipo 1", "Tipo 2"]:
     if col in datos.columns:
         datos[col] = (
@@ -144,7 +143,7 @@ for col in ["Tipo 1", "Tipo 2"]:
             .fillna(datos[col])
         )
 
-# 6. Traducir columnas de "contraataque" o "against"
+# Traducción columnas de "contraataque" o "against"
 for col in datos.columns:
     if "contraataque_" in col.lower() or "against_" in col.lower():
         # Extraer el tipo (ej: de contraataque_fuego saca "fuego")
@@ -155,6 +154,6 @@ for col in datos.columns:
         tipo_es_header = tipos_es.get(tipo_en, tipo_en.title())
         datos.rename(columns={col: f"Resistencia vs {tipo_es_header}"}, inplace=True)
 
-# 6. Guardar el archivo final perfecto
+# Guardar el archivo final 
 # utf-8-sig es para que Excel abra bien las tildes y eñes
 datos.to_csv("pokemon_final.csv", index=False, encoding="utf-8-sig")
